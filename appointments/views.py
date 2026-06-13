@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from .models import Appointment
 from .serializers import AppointmentSerializer
 
-from doctors.models import ( Doctor, DoctorAvailability, DoctorLeave)
+from doctors.models import Doctor, DoctorAvailability, DoctorLeave
 
 from datetime import datetime, timedelta
 
@@ -105,7 +105,15 @@ def create_appointment(request):
         availability.end_time
     ):
 
-            clinic_settings = ClinicSettings.objects.first()
+        return Response(
+            {
+                "error":
+                "Doctor not available at this time"
+            },
+            status=400
+        )
+
+    clinic_settings = ClinicSettings.objects.first()
 
     if not clinic_settings:
 
