@@ -6,8 +6,8 @@ from rest_framework.response import Response
 
 from django.db.models import Q
 
-from .models import Doctor
-from .serializers import DoctorSerializer
+from .models import Doctor, DoctorAvailability, DoctorLeave
+from .serializers import DoctorSerializer, DoctorAvailabilitySerializer, DoctorLeaveSerializer
 
 from accounts.permissions import IsAdmin
 
@@ -130,6 +130,82 @@ def search_doctor(request):
 
     serializer = DoctorSerializer(
         doctors,
+        many=True
+    )
+
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated, IsAdmin])
+def create_availability(request):
+
+    serializer = DoctorAvailabilitySerializer(
+        data=request.data
+    )
+
+    if serializer.is_valid():
+
+        serializer.save()
+
+        return Response(
+            serializer.data,
+            status=201
+        )
+
+    return Response(
+        serializer.errors,
+        status=400
+    )
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def availability_list(request):
+
+    availabilities = (
+        DoctorAvailability.objects.all()
+    )
+
+    serializer = (
+        DoctorAvailabilitySerializer(
+            availabilities,
+            many=True
+        )
+    )
+
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated, IsAdmin])
+def create_leave(request):
+
+    serializer = DoctorLeaveSerializer(
+        data=request.data
+    )
+
+    if serializer.is_valid():
+
+        serializer.save()
+
+        return Response(
+            serializer.data,
+            status=201
+        )
+
+    return Response(
+        serializer.errors,
+        status=400
+    )
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def leave_list(request):
+
+    leaves = DoctorLeave.objects.all()
+
+    serializer = DoctorLeaveSerializer(
+        leaves,
         many=True
     )
 

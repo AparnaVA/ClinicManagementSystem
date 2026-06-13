@@ -14,4 +14,12 @@ urlpatterns = [
     path('delete/<int:id>/', views.delete_doctor),
 
     path('search/', views.search_doctor),
+    
+    path('availability/create/',views.create_availability),
+
+    path('availability/list/',views.availability_list),
+
+    path('leave/create/',views.create_leave),
+
+    path('leave/list/',views.leave_list),
 ]
