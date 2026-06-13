@@ -33,5 +33,29 @@ urlpatterns = [
         'logout/',
         views.logout_user,
         name='logout'
-),
+    ),
+    path(
+    'receptionists/create/',
+    views.create_receptionist
+    ),
+
+    path(
+        'receptionists/list/',
+        views.receptionist_list
+    ),
+
+    path(
+        'receptionists/<int:id>/',
+        views.receptionist_detail
+    ),
+
+    path(
+        'receptionists/update/<int:id>/',
+        views.update_receptionist
+    ),
+
+    path(
+        'receptionists/delete/<int:id>/',
+        views.delete_receptionist
+    ),
 ]   

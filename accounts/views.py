@@ -1,12 +1,14 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from .permissions import IsAdmin
 import uuid
 from django.core.mail import send_mail
 from django.conf import settings
 from .models import User
 from django.utils import timezone
 from datetime import timedelta
+from .serializers import ReceptionistSerializer
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -94,4 +96,124 @@ def logout_user(request):
 
     return Response({
         "message": "Logout successful"
+    })
+    
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated, IsAdmin])
+def create_receptionist(request):
+
+    serializer = ReceptionistSerializer(
+        data=request.data
+    )
+
+    if serializer.is_valid():
+
+        serializer.save()
+
+        return Response(
+            serializer.data,
+            status=201
+        )
+
+    return Response(
+        serializer.errors,
+        status=400
+    )
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAdmin])
+def receptionist_list(request):
+
+    receptionists = User.objects.filter(
+        role='RECEPTIONIST'
+    )
+
+    serializer = ReceptionistSerializer(
+        receptionists,
+        many=True
+    )
+
+    return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAdmin])
+def receptionist_detail(request, id):
+
+    try:
+
+        receptionist = User.objects.get(
+            id=id,
+            role='RECEPTIONIST'
+        )
+
+    except User.DoesNotExist:
+
+        return Response(
+            {"error": "Receptionist not found"},
+            status=404
+        )
+
+    serializer = ReceptionistSerializer(
+        receptionist
+    )
+
+    return Response(serializer.data)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated, IsAdmin])
+def update_receptionist(request, id):
+
+    try:
+
+        receptionist = User.objects.get(
+            id=id,
+            role='RECEPTIONIST'
+        )
+
+    except User.DoesNotExist:
+
+        return Response(
+            {"error": "Receptionist not found"},
+            status=404
+        )
+
+    receptionist.username = request.data.get(
+        'username',
+        receptionist.username
+    )
+
+    receptionist.email = request.data.get(
+        'email',
+        receptionist.email
+    )
+
+    receptionist.save()
+
+    return Response({
+        "message": "Receptionist updated successfully"
+    })
+    
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated, IsAdmin])
+def delete_receptionist(request, id):
+
+    try:
+
+        receptionist = User.objects.get(
+            id=id,
+            role='RECEPTIONIST'
+        )
+
+    except User.DoesNotExist:
+
+        return Response(
+            {"error": "Receptionist not found"},
+            status=404
+        )
+
+    receptionist.delete()
+
+    return Response({
+        "message": "Receptionist deleted successfully"
     })
