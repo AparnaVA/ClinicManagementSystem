@@ -88,3 +88,10 @@ This link expires in 1 hour.
     return Response({
         "message": "Password reset link sent successfully"
     })
+    
+@api_view(['POST'])
+def logout_user(request):
+
+    return Response({
+        "message": "Logout successful"
+    })
