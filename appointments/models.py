@@ -41,6 +41,12 @@ class Appointment(models.Model):
     updated_at = models.DateTimeField(
         auto_now=True
     )
+    
+    consultation_fee = models.DecimalField(
+    max_digits=10,
+    decimal_places=2,
+    default=0
+)
 
     def __str__(self):
         return (

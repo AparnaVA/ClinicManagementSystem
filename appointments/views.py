@@ -183,7 +183,9 @@ def create_appointment(request):
             status=400
         )
         
-    serializer.save()
+    serializer.save(
+    consultation_fee=doctor.consultation_fee
+)
 
     return Response(
         serializer.data,
