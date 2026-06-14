@@ -427,3 +427,155 @@ def search_appointments(request):
         return Response(
             serializer.data
     )
+        
+        
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def calendar_events(request):
+
+    doctor_id = request.GET.get(
+        'doctor_id'
+    )
+
+    status = request.GET.get(
+        'status'
+    )
+
+    appointments = (
+        Appointment.objects.select_related(
+            'patient',
+            'doctor'
+        )
+    )
+    if doctor_id:
+
+        appointments = (
+            appointments.filter(
+                doctor_id=doctor_id
+            )
+        )
+    if status:
+
+        appointments = (
+            appointments.filter(
+                status=status
+            )
+        )
+    events = []
+
+    for appointment in appointments:
+
+        start_datetime = datetime.combine(
+            appointment.appointment_date,
+            appointment.appointment_time
+        )
+
+        events.append({
+
+            "id":
+            appointment.id,
+
+            "title":
+            f"{appointment.patient.name} - "
+            f"{appointment.doctor.name}",
+
+            "start":
+            start_datetime.isoformat(),
+
+            "status":
+            appointment.status
+        })
+        
+        return Response(events)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def daily_calendar(request):
+
+    selected_date = request.GET.get(
+        'date'
+    )
+
+    appointments = (
+        Appointment.objects.filter(
+            appointment_date=
+            selected_date
+        )
+    )
+
+    serializer = (
+        AppointmentSerializer(
+            appointments,
+            many=True
+        )
+    )
+
+    return Response(
+        serializer.data
+    )
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def weekly_calendar(request):
+
+    start_date = datetime.strptime(
+        request.GET.get('date'),
+        "%Y-%m-%d"
+    ).date()
+
+    end_date = (
+        start_date +
+        timedelta(days=6)
+    )
+
+    appointments = (
+        Appointment.objects.filter(
+            appointment_date__range=(
+                start_date,
+                end_date
+            )
+        )
+    )
+
+    serializer = (
+        AppointmentSerializer(
+            appointments,
+            many=True
+        )
+    )
+
+    return Response(
+        serializer.data
+    )
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def monthly_calendar(request):
+
+    month = request.GET.get(
+        'month'
+    )
+
+    year = request.GET.get(
+        'year'
+    )
+
+    appointments = (
+        Appointment.objects.filter(
+            appointment_date__month=
+            month,
+            appointment_date__year=
+            year
+        )
+    )
+
+    serializer = (
+        AppointmentSerializer(
+            appointments,
+            many=True
+        )
+    )
+
+    return Response(
+        serializer.data
+    )
