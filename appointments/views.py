@@ -15,6 +15,8 @@ from datetime import datetime, timedelta
 
 from settings_app.models import ClinicSettings
 
+from .tasks import send_appointment_created_email, send_appointment_cancelled_email
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_appointment(request):
@@ -183,8 +185,11 @@ def create_appointment(request):
             status=400
         )
         
-    serializer.save(
+    appointment = serializer.save(
     consultation_fee=doctor.consultation_fee
+)
+    send_appointment_created_email.delay(
+    appointment.id
 )
 
     return Response(
@@ -215,10 +220,7 @@ def appointment_list(request):
 
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
-def update_appointment_status(
-    request,
-    id
-):
+def update_appointment_status( request, id ):
 
     try:
 
@@ -243,6 +245,12 @@ def update_appointment_status(
     appointment.status = status_value
 
     appointment.save()
+    
+    if status_value == 'CANCELLED':
+
+        send_appointment_cancelled_email.delay(
+        appointment.id
+    )
 
     return Response(
         {
@@ -358,3 +366,64 @@ def available_slots(request):
         "date": appointment_date,
         "available_slots": available_slots
     })
+    
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def search_appointments(request):
+        appointment_date = request.GET.get(
+        'appointment_date'
+    )
+
+        doctor = request.GET.get(
+        'doctor'
+    )
+
+        patient = request.GET.get(
+        'patient'
+    )
+
+        status = request.GET.get(
+        'status'
+    )
+        appointments = (
+        Appointment.objects.all()
+    )
+        if appointment_date:
+
+            appointments = (
+                appointments.filter(
+                    appointment_date = appointment_date
+            )
+        )
+        if doctor:
+
+            appointments = (
+                appointments.filter(
+                    doctor_id=doctor
+            )
+        )
+        if patient:
+
+            appointments = (
+                appointments.filter(
+                    patient_id=patient
+            )
+        )
+        if status:
+
+            appointments = (
+                appointments.filter(
+                    status=status
+            )
+        )
+        serializer = (
+        AppointmentSerializer(
+            appointments,
+            many=True
+        )
+    )
+
+        return Response(
+            serializer.data
+    )

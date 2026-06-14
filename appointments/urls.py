@@ -22,4 +22,8 @@ urlpatterns = [
         'available-slots/',
         views.available_slots
 ),
+    path(
+        'search/',
+        views.search_appointments
+),
 ]
