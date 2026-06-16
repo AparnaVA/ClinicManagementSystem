@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import api from '../api/axios'
+import { useNavigate } from "react-router-dom";
 
 function Login() {
 
   const [username, setUsername] = useState('')
 
   const [password, setPassword] = useState('')
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
 
@@ -23,6 +26,8 @@ function Login() {
         localStorage.setItem('token', response.data.access)
 
         alert('Login Success')
+
+        navigate('/dashboard');
 
       }
 
