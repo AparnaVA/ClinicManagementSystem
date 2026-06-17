@@ -5,6 +5,7 @@ import api from '../api/axios';
 
 function Patients(){
     const [patients, setPatients] = useState([]);
+    const [keyword, setKeyword] = useState('');
 
     useEffect (()=> {
         fetchPatients();
@@ -60,12 +61,87 @@ function Patients(){
         }
     };
 
+    const searchPatients =
+async () => {
+
+    try {
+
+        const token =
+            localStorage.getItem(
+                'token'
+            );
+
+        const response =
+            await api.get(
+
+                `patients/search/?search=${keyword}`,
+
+                {
+                    headers: {
+                        Authorization:
+                        `Bearer ${token}`
+                    }
+                }
+            );
+
+        setPatients(
+            response.data
+        );
+
+    } catch (error) {
+
+        console.log(error);
+    }
+};
+
+useEffect(() => {
+
+    if (
+        keyword.trim() === ''
+    ) {
+
+        fetchPatients();
+
+        return;
+    }
+
+    searchPatients();
+
+}, [keyword]);
+
 
 return(
     <>
     <Navbar />
 
     <div className="container mt-4">
+
+        <div
+    className="row mt-3"
+>
+
+    <div className="col-md-4">
+
+        <input
+            type="text"
+            className="form-control"
+            placeholder="Search Patient"
+            value={keyword}
+            onChange={(e) =>
+                setKeyword(
+                    e.target.value
+                )
+            }
+        />
+
+    </div>
+
+    <div className="col-md-2">
+
+    </div>
+
+
+</div>
 
         <div
             className="d-flex
