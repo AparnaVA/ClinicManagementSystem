@@ -29,10 +29,17 @@ function Navbar() {
                 </span>
 
                 <Link
-                    className="nav-link"
+                    className="nav-link text-white"
                     to="/patients"
                 >
                     Patients
+                </Link>
+
+                 <Link
+                    className="nav-link text-white"
+                    to="/doctors"
+                >
+                    Doctors
                 </Link>
 
                 <button

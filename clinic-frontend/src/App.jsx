@@ -6,6 +6,9 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Patients from './pages/Patients';
 import AddPatient from './pages/AddPatient';
 import EditPatient from './pages/EditPatient';
+import Doctors from './pages/Doctors';
+import AddDoctor from './pages/AddDoctor';
+import EditDoctor from './pages/EditDoctor';
 
 function App() {
 
@@ -54,6 +57,35 @@ function App() {
                 </ProtectedRoute>
             }
         />
+
+        <Route
+        path="/doctors"
+        element={
+          <ProtectedRoute>
+            <Doctors />
+          </ProtectedRoute>
+        }>
+        </Route>
+
+        <Route
+        path='/doctors/create'
+        element={
+          <ProtectedRoute>
+            <AddDoctor />
+          </ProtectedRoute>
+        }
+        >
+        </Route>
+
+        <Route
+        path='/doctors/edit/:id'
+        element={
+          <ProtectedRoute>
+            <EditDoctor />
+          </ProtectedRoute>
+        }
+        >
+        </Route>
 
       </Routes>
 
