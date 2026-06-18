@@ -188,9 +188,13 @@ def create_appointment(request):
     appointment = serializer.save(
     consultation_fee=doctor.consultation_fee
 )
-    send_appointment_created_email.delay(
-    appointment.id
-)
+    try:
+        send_appointment_created_email(
+        appointment.id
+    )
+    except Exception as e:
+
+        print("EMAIL ERROR:", e)
 
     return Response(
         serializer.data,

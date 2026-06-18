@@ -9,6 +9,8 @@ import EditPatient from './pages/EditPatient';
 import Doctors from './pages/Doctors';
 import AddDoctor from './pages/AddDoctor';
 import EditDoctor from './pages/EditDoctor';
+import AddAppointment from './pages/AddAppointment'
+import Appointments from './pages/Appointments'
 
 function App() {
 
@@ -86,6 +88,23 @@ function App() {
         }
         >
         </Route>
+        <Route
+          path="/appointments/add"
+          element={
+              <ProtectedRoute>
+                  <AddAppointment />
+              </ProtectedRoute>
+          }
+      />
+
+      <Route
+        path="/appointments"
+        element={
+            <ProtectedRoute>
+                <Appointments />
+            </ProtectedRoute>
+        }
+    />
 
       </Routes>
 

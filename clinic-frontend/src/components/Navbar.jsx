@@ -35,11 +35,25 @@ function Navbar() {
                     Patients
                 </Link>
 
-                 <Link
+                <Link
                     className="nav-link text-white"
                     to="/doctors"
                 >
                     Doctors
+                </Link>
+
+                 <Link
+                    className="nav-link text-white"
+                    to="/appointments/add"
+                >
+                    Add Appointment
+                </Link>
+
+                <Link
+                    className="nav-link text-white"
+                    to="/appointments"
+                >
+                    Appointments
                 </Link>
 
                 <button
