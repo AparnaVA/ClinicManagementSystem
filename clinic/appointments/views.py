@@ -224,12 +224,12 @@ def appointment_list(request):
 
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
-def update_appointment_status( request, id ):
+def update_appointment_status(request, id):
 
     try:
 
-        appointment = (
-            Appointment.objects.get(id=id)
+        appointment = Appointment.objects.get(
+            id=id
         )
 
     except Appointment.DoesNotExist:
@@ -242,19 +242,43 @@ def update_appointment_status( request, id ):
             status=404
         )
 
-    status_value = (
-        request.data.get('status')
+    status_value = request.data.get(
+        'status'
     )
+
+    valid_statuses = [
+
+        'SCHEDULED',
+        'COMPLETED',
+        'CANCELLED',
+        'NO_SHOW'
+    ]
+
+    if status_value not in valid_statuses:
+
+        return Response(
+            {
+                "error":
+                "Invalid status"
+            },
+            status=400
+        )
 
     appointment.status = status_value
 
     appointment.save()
-    
+
     if status_value == 'CANCELLED':
 
-        send_appointment_cancelled_email.delay(
-        appointment.id
-    )
+        try:
+
+            send_appointment_cancelled_email(
+                appointment.id
+            )
+
+        except Exception as e:
+
+            print(e)
 
     return Response(
         {
@@ -262,7 +286,6 @@ def update_appointment_status( request, id ):
             "Status updated"
         }
     )
-    
 
 from datetime import datetime, timedelta
 
@@ -391,7 +414,7 @@ def search_appointments(request):
         'status'
     )
         appointments = (
-        Appointment.objects.all()
+        Appointment.objects.select_related('patient', 'doctor').all()
     )
         if appointment_date:
 
