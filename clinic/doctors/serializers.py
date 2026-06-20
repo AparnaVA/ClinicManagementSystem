@@ -11,12 +11,22 @@ class DoctorSerializer(serializers.ModelSerializer):
 
 class DoctorAvailabilitySerializer(serializers.ModelSerializer):
 
+    doctor_name = serializers.CharField(
+        source='doctor.name',
+        read_only=True
+    )
+    
     class Meta:
         model = DoctorAvailability
         fields = '__all__'
         
         
 class DoctorLeaveSerializer(serializers.ModelSerializer):
+
+    doctor_name = serializers.CharField(
+        source='doctor.name',
+        read_only=True
+    )
 
     class Meta:
         model = DoctorLeave

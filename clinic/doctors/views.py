@@ -175,6 +175,37 @@ def availability_list(request):
 
     return Response(serializer.data)
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_availability(request, id):
+
+    try:
+
+        availability = (
+            DoctorAvailability.objects.get(
+                id=id
+            )
+        )
+
+    except DoctorAvailability.DoesNotExist:
+
+        return Response(
+            {
+                "error":
+                "Availability not found"
+            },
+            status=404
+        )
+
+    availability.delete()
+
+    return Response(
+        {
+            "message":
+            "Availability deleted"
+        }
+    )
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated, IsAdmin])
@@ -210,3 +241,34 @@ def leave_list(request):
     )
 
     return Response(serializer.data)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_leave(request, id):
+
+    try:
+
+        leave = (
+            DoctorLeave.objects.get(
+                id=id
+            )
+        )
+
+    except DoctorLeave.DoesNotExist:
+
+        return Response(
+            {
+                "error":
+                "Leave not found"
+            },
+            status=404
+        )
+
+    leave.delete()
+
+    return Response(
+        {
+            "message":
+            "Leave deleted"
+        }
+    )

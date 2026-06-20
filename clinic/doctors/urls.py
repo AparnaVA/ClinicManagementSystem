@@ -18,8 +18,12 @@ urlpatterns = [
     path('availability/create/',views.create_availability),
 
     path('availability/list/',views.availability_list),
+    
+    path('availability/delete/<int:id>/', views.delete_availability),
 
     path('leave/create/',views.create_leave),
 
     path('leave/list/',views.leave_list),
+    
+    path('leave/delete/<int:id>/', views.delete_leave ),
 ]

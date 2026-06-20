@@ -11,6 +11,7 @@ import AddDoctor from './pages/AddDoctor';
 import EditDoctor from './pages/EditDoctor';
 import AddAppointment from './pages/AddAppointment'
 import Appointments from './pages/Appointments'
+import DoctorAvailability from './pages/DoctorAvailability'
 
 function App() {
 
@@ -102,6 +103,15 @@ function App() {
         element={
             <ProtectedRoute>
                 <Appointments />
+            </ProtectedRoute>
+        }
+    />
+
+        <Route
+        path="/doctorAvailable"
+        element={
+            <ProtectedRoute>
+                <DoctorAvailability />
             </ProtectedRoute>
         }
     />

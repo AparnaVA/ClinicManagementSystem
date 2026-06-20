@@ -56,6 +56,13 @@ function Navbar() {
                     Appointments
                 </Link>
 
+                <Link
+                    className="nav-link text-white"
+                    to="/doctorAvailable"
+                >
+                    Doctor Availability
+                </Link>
+
                 <button
                     className="btn btn-danger"
                     onClick={logout}
