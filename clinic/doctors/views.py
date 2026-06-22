@@ -139,6 +139,47 @@ def search_doctor(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated, IsAdmin])
 def create_availability(request):
+    
+    doctor = request.data.get('doctor')
+
+    working_day = request.data.get(
+        'working_day'
+    )
+
+    availability_exists = (
+        DoctorAvailability.objects.filter(
+            doctor_id=doctor,
+            working_day=working_day
+        ).exists()
+    )
+
+    if availability_exists:
+
+        return Response(
+            {
+                "error":
+                "Availability already exists for this day"
+            },
+            status=400
+        )
+    
+    start_time = request.data.get(
+    'start_time'
+    )
+
+    end_time = request.data.get(
+    'end_time'
+    )
+
+    if start_time >= end_time:
+
+        return Response(
+            {
+                "error":
+                "End time must be greater than start time"
+            },
+            status=400
+        )
 
     serializer = DoctorAvailabilitySerializer(
         data=request.data
@@ -210,6 +251,21 @@ def delete_availability(request, id):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated, IsAdmin])
 def create_leave(request):
+    
+    doctor = request.data.get('doctor')
+    
+    leave_date = request.data.get('leave_date')
+    
+    leave_exists = (DoctorLeave.objects.filter( doctor_id=doctor, leave_date=leave_date).exists())
+    
+    if leave_exists:
+        return Response(
+            {
+                "error":
+                "Leave already exists for this date"
+            },
+            status=400
+        )
 
     serializer = DoctorLeaveSerializer(
         data=request.data

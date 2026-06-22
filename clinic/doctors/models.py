@@ -101,6 +101,13 @@ class DoctorAvailability(models.Model):
     start_time = models.TimeField()
 
     end_time = models.TimeField()
+    
+    class Meta:
+
+        unique_together = (
+            'doctor',
+            'working_day'
+        )
 
     def __str__(self):
         return f"{self.doctor.name} - {self.working_day}"
@@ -117,6 +124,13 @@ class DoctorLeave(models.Model):
     leave_date = models.DateField()
 
     reason = models.TextField()
+    
+    class Meta:
+
+        unique_together = (
+            'doctor',
+            'leave_date'
+        )
 
     def __str__(self):
         return (

@@ -497,23 +497,38 @@ def calendar_events(request):
             appointment.appointment_time
         )
 
-        events.append({
+        color = {
+    "SCHEDULED": "#0d6efd",
+    "COMPLETED": "#198754",
+    "CANCELLED": "#dc3545",
+    "NO_SHOW": "#fd7e14"
+    }.get(
+        appointment.status,
+        "#6c757d"
+    )
 
-            "id":
-            appointment.id,
+    events.append({
 
-            "title":
-            f"{appointment.patient.name} - "
-            f"{appointment.doctor.name}",
+        "id": appointment.id,
 
-            "start":
-            start_datetime.isoformat(),
+        "title":
+        f"{appointment.patient.name} - "
+        f"{appointment.doctor.name}",
 
-            "status":
-            appointment.status
-        })
+        "start": start_datetime.isoformat(),
+
+        "status": appointment.status,
+
+        "color": color,
         
-        return Response(events)
+         "patient": appointment.patient.name,
+
+        "doctor": appointment.doctor.name,
+
+        "reason": appointment.reason
+    })
+        
+    return Response(events)
     
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

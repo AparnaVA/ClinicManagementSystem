@@ -9,9 +9,11 @@ import EditPatient from './pages/EditPatient';
 import Doctors from './pages/Doctors';
 import AddDoctor from './pages/AddDoctor';
 import EditDoctor from './pages/EditDoctor';
-import AddAppointment from './pages/AddAppointment'
-import Appointments from './pages/Appointments'
-import DoctorAvailability from './pages/DoctorAvailability'
+import AddAppointment from './pages/AddAppointment';
+import Appointments from './pages/Appointments';
+import DoctorAvailability from './pages/DoctorAvailability';
+import DoctorLeave from './pages/DoctorLeave';
+import AppointmentCalendar from './pages/AppointmentCalendar';
 
 function App() {
 
@@ -115,6 +117,21 @@ function App() {
             </ProtectedRoute>
         }
     />
+
+    <Route
+        path="/doctorLeave"
+        element={
+            <ProtectedRoute>
+                <DoctorLeave />
+            </ProtectedRoute>
+        }
+    />
+    <Route
+    path="/calendar"
+    element={
+        <AppointmentCalendar />
+    }
+/>
 
       </Routes>
 

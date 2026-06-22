@@ -63,6 +63,18 @@ function Navbar() {
                     Doctor Availability
                 </Link>
 
+                <Link
+                    className="nav-link text-white"
+                    to="/doctorLeave"
+                >
+                    Doctor Leave
+                </Link>
+                <Link
+                    to="/calendar"
+                >
+                    Calendar
+                </Link>
+
                 <button
                     className="btn btn-danger"
                     onClick={logout}
