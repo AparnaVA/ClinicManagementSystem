@@ -1,0 +1,223 @@
+/* --- Background & Global Layout --- */
+.page-wrapper {
+    min-height: 100vh;
+    background-color: #f4f7f5; /* Light grey-green sterile medical tint */
+    font-family: 'Inter', system-ui, sans-serif;
+    color: #2d3748;
+}
+
+.dashboard-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    max-width: 1250px;
+    margin: 2.5rem auto;
+    padding: 0 1.5rem;
+}
+
+@media (min-width: 992px) {
+    .dashboard-container {
+        grid-template-columns: 380px 1fr; /* Side-by-side format */
+    }
+}
+
+/* --- Crisp Light Cards --- */
+.clinic-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 1.75rem;
+    box-shadow: 0 4px 18px rgba(31, 63, 53, 0.05);
+    border: 1px solid rgba(47, 91, 74, 0.08);
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f3f35; /* Matching your navbar dark green */
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.01em;
+}
+
+/* --- Clean Modern Form Fields --- */
+.input-group-custom {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 1.25rem;
+}
+
+.time-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.input-group-custom label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+.clinic-card select,
+.clinic-card input[type="time"] {
+    width: 100%;
+    background: #f8faf9;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 0.7rem 0.85rem;
+    color: #334155;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.clinic-card select:focus,
+.clinic-card input[type="time"]:focus {
+    border-color: #2f5b4a;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(47, 91, 74, 0.12);
+}
+
+/* --- Matching Navbar Buttons --- */
+.btn-save {
+    width: 100%;
+    background: #2f5b4a; /* Matches your core navbar color */
+    color: #ffffff;
+    font-weight: 600;
+    border: none;
+    padding: 0.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background 0.2s ease, transform 0.1s ease;
+    margin-top: 0.5rem;
+}
+
+.btn-save:hover {
+    background: #1f3f35;
+}
+
+.btn-save:active {
+    transform: scale(0.99);
+}
+
+.btn-action-delete {
+    background: #fff5f5;
+    color: #e53e3e;
+    border: 1px solid #fed7d7;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-action-delete:hover {
+    background: #e53e3e;
+    color: #ffffff;
+    border-color: #e53e3e;
+}
+
+/* --- Medical Data Table Styles --- */
+.table-responsive-custom {
+    overflow-x: auto;
+}
+
+.clinic-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.95rem;
+}
+
+.clinic-table th {
+    background: #f8faf9;
+    color: #4a5568;
+    font-weight: 600;
+    padding: 0.85rem 1rem;
+    border-bottom: 2px solid rgba(47, 91, 74, 0.1);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.clinic-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    color: #4a5568;
+    vertical-align: middle;
+}
+
+.clinic-table tr:hover td {
+    background-color: #fdfdfd;
+}
+
+.doctor-name-cell {
+    font-weight: 600;
+    color: #1f3f35;
+}
+
+.time-cell {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Day Badges themed to your brand green */
+.day-badge {
+    background: rgba(47, 91, 74, 0.08);
+    color: #2f5b4a;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.empty-state {
+    text-align: center;
+    color: #718096;
+    padding: 3rem !important;
+    font-style: italic;
+}
+
+/* --- Pagination Layout --- */
+.pagination-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.page-btn {
+    background: #ffffff;
+    color: #4a5568;
+    border: 1px solid #cbd5e1;
+    padding: 0.5rem 0.9rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.page-btn:hover:not(:disabled) {
+    background: #f8faf9;
+    border-color: #2f5b4a;
+    color: #2f5b4a;
+}
+
+.page-btn.active {
+    background: #2f5b4a; /* Matches your navbar brand green */
+    color: #ffffff;
+    border-color: #2f5b4a;
+}
+
+.page-btn:disabled {
+    background: #f1f5f9;
+    color: #94a3b8;
+    border-color: #e2e8f0;
+    cursor: not-allowed;
+}

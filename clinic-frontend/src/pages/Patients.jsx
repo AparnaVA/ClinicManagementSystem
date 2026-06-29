@@ -1,249 +1,282 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import api from '../api/axios';
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import Navbar from '../components/Navbar'
+import api from '../api/axios'
 
-function Patients(){
-    const [patients, setPatients] = useState([]);
-    const [keyword, setKeyword] = useState('');
+function Patients() {
+  const [patients, setPatients] = useState([])
+  const [keyword, setKeyword] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const patientsPerPage = 5
 
-    useEffect (()=> {
-        fetchPatients();
-    }, []);
+  useEffect(() => {
+    fetchPatients()
+  }, [])
 
-    const fetchPatients = async () => {
-
+  const fetchPatients = async () => {
     try {
+      const token = localStorage.getItem('token')
 
-        const token = localStorage.getItem('token');
+      const response = await api.get('patients/list/', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
 
-        const response = await api.get('patients/list/',
-                {
-                    headers: {
-                        Authorization:
-                        `Bearer ${token}`
-                    }
-                }
-            );
-
-        setPatients( response.data );
-
-        } catch (error) {
-
-            console.log(error);
-        }
-    }
-        const deletePatient = async (id) => {
-
-        if ( !window.confirm('Delete Patient?')) {
-            return;
-        }
-
-        try {
-
-            const token = localStorage.getItem('token' );
-
-            await api.delete(`patients/delete/${id}/`, {
-               
-                headers: {
-
-                    Authorization:
-                    `Bearer ${token}`
-                }
-            }
-        );
-
-        fetchPatients();
-
-        } catch (error) {
-
-            console.log(error);
-        }
-    };
-
-    const searchPatients =
-async () => {
-
-    try {
-
-        const token =
-            localStorage.getItem(
-                'token'
-            );
-
-        const response =
-            await api.get(
-
-                `patients/search/?search=${keyword}`,
-
-                {
-                    headers: {
-                        Authorization:
-                        `Bearer ${token}`
-                    }
-                }
-            );
-
-        setPatients(
-            response.data
-        );
-
+      setPatients(response.data)
     } catch (error) {
-
-        console.log(error);
+      console.log(error)
     }
-};
+  }
 
-useEffect(() => {
-
-    if (
-        keyword.trim() === ''
-    ) {
-
-        fetchPatients();
-
-        return;
+  const deletePatient = async (id) => {
+    if (!window.confirm('Delete Patient?')) {
+      return
     }
 
-    searchPatients();
+    try {
+      const token = localStorage.getItem('token')
 
-}, [keyword]);
+      await api.delete(`patients/delete/${id}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
 
+      fetchPatients()
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
-return(
+  const searchPatients = async () => {
+    try {
+      const token = localStorage.getItem('token')
+
+      const response = await api.get(`patients/search/?search=${keyword}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      setPatients(response.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    if (keyword.trim() === '') {
+      fetchPatients()
+      return
+    }
+
+    searchPatients()
+  }, [keyword])
+
+  const totalPages = Math.ceil(patients.length / patientsPerPage)
+  const startIndex = (currentPage - 1) * patientsPerPage
+  const currentPatients = patients.slice(startIndex, startIndex + patientsPerPage)
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [keyword])
+
+  return (
     <>
-    <Navbar />
+      <Navbar />
+      <div className="patients-page">
+        <style>{`
+          .patients-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f7fbf8 0%, #eef6f4 100%);
+            padding: 24px 0 40px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          }
 
-    <div className="container mt-4">
+          .page-card {
+            background: rgba(255,255,255,0.96);
+            border: 0;
+            border-radius: 24px;
+            box-shadow: 0 14px 40px rgba(31, 63, 53, 0.08);
+            padding: 24px;
+          }
 
-        <div
-    className="row mt-3"
->
+          .page-title {
+            color: #1f3f35;
+            font-weight: 700;
+          }
 
-    <div className="col-md-4">
+          .search-box {
+            border-radius: 999px;
+            border: 4px solid #dce9e3;
+            padding: 12px 16px;
+            background: #f8fcfa;
+          }
 
-        <input
-            type="text"
-            className="form-control"
-            placeholder="Search Patient"
-            value={keyword}
-            onChange={(e) =>
-                setKeyword(
-                    e.target.value
-                )
-            }
-        />
+          .search-box:focus {
+            box-shadow: 0 0 0 0.2rem rgba(63, 111, 93, 0.16);
+            border-color: #8dc3b6;
+          }
 
-    </div>
+          .add-btn {
+            border-radius: 999px;
+            padding: 10px 16px;
+            background: linear-gradient(135deg, #3f6f5d, #5a8874);
+            border: none;
+            font-weight: 600;
+          }
 
-    <div className="col-md-2">
+          .table-wrap {
+            overflow: hidden;
+            border-radius: 16px;
+            border: 1px solid #e8f1ec;
+          }
 
-    </div>
+          .patients-table thead {
+            background: linear-gradient(135deg, #3f6f5d, #5a8874);
+            color: white;
+          }
 
+          .patients-table th,
+          .patients-table td {
+            vertical-align: middle;
+            padding: 14px 16px;
+          }
 
-</div>
+          .patients-table tbody tr:nth-child(even) {
+            background: #f8fcfa;
+          }
 
-        <div
-            className="d-flex
-            justify-content-between"
-        >
+          .action-btn-edit {
+            border-radius: 999px;
+            padding: 7px 12px;
+            background: #f7d97a;
+            color: #6c4c0b;
+            border: none;
+            font-weight: 600;
+          }
 
-            <h2>Patients</h2>
+          .action-btn-delete {
+            border-radius: 999px;
+            padding: 7px 12px;
+            background: #f7dede;
+            color: #9b1c1c;
+            border: none;
+            font-weight: 600;
+          }
 
-            <Link
-                to="/patients/add"
-                className=
-                "btn btn-primary"
-            >
-                Add Patient
-            </Link>
+          .pagination-wrap {
+            display: flex;
+            justify-content: center;
+            margin-top: 16px;
+            gap: 8px;
+          }
 
-        </div>
+          .page-btn {
+            border-radius: 999px;
+            border: 1px solid #dce9e3;
+            background: white;
+            color: #2f5b4a;
+            padding: 7px 12px;
+            font-weight: 600;
+          }
 
-        <table
-            className=
-            "table table-bordered mt-3"
-        >
+          .page-btn.active {
+            background: linear-gradient(135deg, #3f6f5d, #5a8874);
+            color: white;
+            border: none;
+          }
+        `}</style>
 
-            <thead>
+        <div className="container">
+          <div className="page-card">
+            <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+              <div>
+                <h2 className="page-title mb-1">Patients</h2>
+                <p className="text-muted mb-0">Manage patient records and keep everything organized.</p>
+              </div>
 
-                <tr>
+              <div className="d-flex flex-column flex-md-row gap-2 w-100 w-md-auto">
+                <input
+                  type="text"
+                  className="form-control search-box"
+                  placeholder="Search patient"
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
+                />
+                <Link to="/patients/add" className="btn btn-primary add-btn">
+                  Add Patient
+                </Link>
+              </div>
+            </div>
 
+            <div className="table-wrap">
+              <table className="table table-hover mb-0 patients-table">
+                <thead>
+                  <tr>
                     <th>ID</th>
                     <th>Name</th>
                     <th>Phone</th>
                     <th>Email</th>
                     <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentPatients.map((patient) => (
+                    <tr key={patient.id}>
+                      <td>{patient.patient_id}</td>
+                      <td>{patient.name}</td>
+                      <td>{patient.phone}</td>
+                      <td>{patient.email}</td>
+                      <td>
+                        <Link to={`/patients/edit/${patient.id}`} className="btn btn-sm action-btn-edit me-2">
+                          Edit
+                        </Link>
+                        <button className="btn btn-sm action-btn-delete" onClick={() => deletePatient(patient.id)}>
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-                </tr>
+            {totalPages > 1 && (
+              <div className="pagination-wrap">
+                <button
+                  className="page-btn"
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </button>
 
-            </thead>
+                {Array.from({ length: totalPages }, (_, index) => (
+                  <button
+                    key={index + 1}
+                    className={`page-btn ${currentPage === index + 1 ? 'active' : ''}`}
+                    onClick={() => setCurrentPage(index + 1)}
+                  >
+                    {index + 1}
+                  </button>
+                ))}
 
-            <tbody>
-
-                {
-                    patients.map(
-                        (patient) => (
-
-                        <tr
-                            key={patient.id}
-                        >
-
-                            <td>
-                                {patient.patient_id}
-                            </td>
-
-                            <td>
-                                {patient.name}
-                            </td>
-
-                            <td>
-                                {patient.phone}
-                            </td>
-
-                            <td>
-                                {patient.email}
-                            </td>
-
-                            <td>
-
-                                <Link
-                                    to={
-                                    `/patients/edit/${patient.id}`
-                                    }
-                                    className=
-                                    "btn btn-warning btn-sm"
-                                >
-                                    Edit
-                                </Link>
-                                <button
-                                    className="btn btn-danger btn-sm ms-2"
-
-                                    onClick={() =>
-                                        deletePatient(
-                                            patient.id
-                                        )
-                                    }
-                                >
-                                Delete
-                                </button>
-
-
-                            </td>
-
-                        </tr>
-
-                    ))
-                }
-
-            </tbody>
-
-        </table>
-
-    </div>
+                <button
+                  className="page-btn"
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </>
-);
-
+  )
 }
 
-export default Patients;
+export default Patients

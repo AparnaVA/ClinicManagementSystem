@@ -4,155 +4,461 @@ import Navbar from '../components/Navbar';
 import api from '../api/axios';
 
 function AddPatient() {
-
     const navigate = useNavigate();
-
+    const [message, setMessage] = useState({ type: '', text: '' });
+    const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
-
-            name: '',
-            age: '',
-            gender: '',
-            phone: '',
-            email: '',
-            address: '',
-            emergency_contact: ''
+        name: '',
+        age: '',
+        gender: '',
+        phone: '',
+        email: '',
+        address: '',
+        emergency_contact: ''
+    });
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
         });
-        const handleChange = (e) => {  setFormData({
-
-                ...formData,
-
-                [e.target.name]: e.target.value
-            });
-        };
-        const handleSubmit =
-    async (e) => {
-
+    };
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        try {
-
-            const token =
-                localStorage.getItem(
-                    'token'
-                );
-
-            await api.post(
-
-                'patients/create/',
-
-                formData,
-
-                {
-                    headers: {
-
-                        Authorization:
-                        `Bearer ${token}`
-                    }
-                }
-            );
-
-            alert(
-                'Patient Added'
-            );
-
-            navigate(
-                '/patients'
-            );
-
-        } catch (error) {
-
-            console.log(error);
+        if (!formData.name || !formData.age || !formData.gender || !formData.phone || !formData.email) {
+            setMessage({ type: 'error', text: 'Please fill in all required fields' });
+            return;
         }
-        };
-        return (
 
-            <>
+        if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(formData.email)) {
+            setMessage({ type: 'error', text: 'Please enter a valid email address' });
+            return;
+        }
+
+        if (!/^\d{10}$/.test(formData.phone.replace(/[\s-]/g, ''))) {
+            setMessage({ type: 'error', text: 'Please enter a valid 10-digit phone number' });
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const token = localStorage.getItem('token');
+            await api.post('patients/create/', formData, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            setMessage({ type: 'success', text: 'Patient added successfully! Redirecting...' });
+            
+            setTimeout(() => {
+                navigate('/patients');
+            }, 1500);
+        } catch (error) {
+            console.log(error);
+            setMessage({ type: 'error', text: error.response?.data?.message || 'Failed to add patient. Please try again.' });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    return (
+        <>
             <Navbar />
+            <div className="add-patient-page">
+                <div className="container">
+                    <div className="page-header">
+                        <div className="header-content">
+                            <div className="header-icon">👤</div>
+                            <div>
+                                <h1 className="page-title">Add New Patient</h1>
+                                <p className="page-subtitle">Register a new patient in the clinic management system</p>
+                            </div>
+                        </div>
+                    </div>
 
-            <div className="container mt-4">
+                    {message.text && (
+                        <div className={`status-message ${message.type === 'success' ? 'status-success' : 'status-error'}`}>
+                            <span className="status-icon">{message.type === 'success' ? '✓' : '✕'}</span>
+                            <span>{message.text}</span>
+                        </div>
+                    )}
 
-            <h2>Add Patient</h2>
+                    <div className="patient-card">
+                        <form onSubmit={handleSubmit}>
+                            <div className="row">
+                                <div className="col-lg-6 mb-4">
+                                    <div className="form-group">
+                                        <label className="form-label">
+                                            <span className="field-icon">📝</span> Full Name
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            className="form-control custom-input"
+                                            placeholder="Enter patient's full name"
+                                            value={formData.name}
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                    </div>
+                                </div>
 
-            <form onSubmit={ handleSubmit } >
+                                <div className="col-lg-6 mb-4">
+                                    <div className="form-group">
+                                        <label className="form-label">
+                                            <span className="field-icon">🎂</span> Age
+                                        </label>
+                                        <input
+                                            type="number"
+                                            name="age"
+                                            className="form-control custom-input"
+                                            placeholder="Enter age"
+                                            min="0"
+                                            max="120"
+                                            value={formData.age}
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                    </div>
+                                </div>
 
-            <input
-                type="text"
-                name="name"
-                placeholder="Name"
-                className="form-control mb-2"
-                onChange={handleChange}
-            />
+                                <div className="col-lg-6 mb-4">
+                                    <div className="form-group">
+                                        <label className="form-label">
+                                            <span className="field-icon">⚤</span> Gender
+                                        </label>
+                                        <select
+                                            name="gender"
+                                            className="form-control custom-select"
+                                            value={formData.gender}
+                                            onChange={handleChange}
+                                            required
+                                        >
+                                            <option value="">-- Select Gender --</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
 
-            <input
-                type="number"
-                name="age"
-                placeholder="Age"
-                className="form-control mb-2"
-                onChange={handleChange}
-            />
+                                <div className="col-lg-6 mb-4">
+                                    <div className="form-group">
+                                        <label className="form-label">
+                                            <span className="field-icon">📱</span> Phone Number
+                                        </label>
+                                        <input
+                                            type="tel"
+                                            name="phone"
+                                            className="form-control custom-input"
+                                            placeholder="10-digit phone number"
+                                            value={formData.phone}
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                    </div>
+                                </div>
 
-            <select
-                name="gender"
-                className="form-control mb-2"
-                onChange={handleChange}
-            >
+                                <div className="col-lg-6 mb-4">
+                                    <div className="form-group">
+                                        <label className="form-label">
+                                            <span className="field-icon">✉️</span> Email Address
+                                        </label>
+                                        <input
+                                            type="email"
+                                            name="email"
+                                            className="form-control custom-input"
+                                            placeholder="example@email.com"
+                                            value={formData.email}
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                    </div>
+                                </div>
 
-            <option value="">
-            Select Gender
-            </option>
+                                <div className="col-lg-6 mb-4">
+                                    <div className="form-group">
+                                        <label className="form-label">
+                                            <span className="field-icon">📞</span> Emergency Contact
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="emergency_contact"
+                                            className="form-control custom-input"
+                                            placeholder="Emergency contact name & number"
+                                            value={formData.emergency_contact}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                </div>
 
-            <option value="Male">
-            Male
-            </option>
+                                <div className="col-12 mb-4">
+                                    <div className="form-group">
+                                        <label className="form-label">
+                                            <span className="field-icon">🏠</span> Address
+                                        </label>
+                                        <textarea
+                                            name="address"
+                                            className="form-control custom-textarea"
+                                            rows="4"
+                                            placeholder="Enter patient's residential address"
+                                            value={formData.address}
+                                            onChange={handleChange}
+                                        ></textarea>
+                                    </div>
+                                </div>
+                            </div>
 
-            <option value="Female">
-            Female
-            </option>
+                            <div className="form-actions">
+                                <button
+                                    type="submit"
+                                    className="btn btn-save"
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? 'Saving...' : '✓ Save Patient'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
 
-            </select>
+                <style>{`
+                    .add-patient-page {
+                        min-height: 100vh;
+                        background: linear-gradient(135deg, #f5faf9 0%, #e8f3f0 100%);
+                        padding: 40px 20px;
+                    }
 
-            <input
-                type="text"
-                name="phone"
-                placeholder="Phone"
-                className="form-control mb-2"
-                onChange={handleChange}
-            />
+                    .page-header {
+                        margin-bottom: 40px;
+                        animation: slideDown 0.5s ease;
+                    }
 
-            <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                className="form-control mb-2"
-                onChange={handleChange}
-            />
+                    .header-content {
+                        display: flex;
+                        align-items: flex-start;
+                        gap: 20px;
+                    }
 
-            <textarea
-                name="address"
-                placeholder="Address"
-                className="form-control mb-2"
-                onChange={handleChange}
-            />
+                    .header-icon {
+                        font-size: 2.5rem;
+                        animation: bounce 0.6s ease;
+                    }
 
-            <input
-                type="text"
-                name="emergency_contact"
-                placeholder="Emergency Contact"
-                className="form-control mb-2"
-                onChange={handleChange}
-            />
+                    .page-title {
+                        color: #1f3f35;
+                        font-size: 2rem;
+                        font-weight: 700;
+                        margin: 0 0 8px 0;
+                        letter-spacing: -0.5px;
+                    }
 
-            <button
-                className="btn btn-success"
-            >
-            Save
-            </button>
+                    .page-subtitle {
+                        color: #5a7a71;
+                        font-size: 1rem;
+                        margin: 0;
+                        font-weight: 400;
+                    }
 
-        </form>
+                    .status-message {
+                        padding: 16px 20px;
+                        border-radius: 12px;
+                        margin-bottom: 24px;
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        font-weight: 500;
+                        animation: slideInDown 0.3s ease;
+                    }
 
-    </div>
-    </>
-);
+                    .status-success {
+                        background-color: #e9f7f0;
+                        color: #065f46;
+                        border-left: 4px solid #3f6f5d;
+                    }
+
+                    .status-error {
+                        background-color: #fef2f2;
+                        color: #b42222;
+                        border-left: 4px solid #dc2626;
+                    }
+
+                    .status-icon {
+                        font-weight: 700;
+                        font-size: 1.1rem;
+                    }
+
+                    .patient-card {
+                        background: white;
+                        border-radius: 24px;
+                        padding: 40px;
+                        box-shadow: 0 8px 32px rgba(31, 63, 53, 0.12);
+                        animation: slideUp 0.5s ease;
+                    }
+
+                    .form-group {
+                        display: flex;
+                        flex-direction: column;
+                    }
+
+                    .form-label {
+                        color: #1f3f35;
+                        font-weight: 600;
+                        margin-bottom: 10px;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        font-size: 0.95rem;
+                    }
+
+                    .field-icon {
+                        font-size: 1.1rem;
+                    }
+
+                    .custom-input,
+                    .custom-select,
+                    .custom-textarea {
+                        border: 2px solid #e8f3f0;
+                        border-radius: 12px;
+                        padding: 12px 16px;
+                        font-size: 1rem;
+                        transition: all 0.3s ease;
+                        font-family: inherit;
+                        background-color: #f9fcfb;
+                    }
+
+                    .custom-input:focus,
+                    .custom-select:focus,
+                    .custom-textarea:focus {
+                        outline: none;
+                        border-color: #3f6f5d;
+                        background-color: white;
+                        box-shadow: 0 0 0 3px rgba(63, 111, 93, 0.1);
+                    }
+
+                    .custom-input:hover,
+                    .custom-select:hover,
+                    .custom-textarea:hover {
+                        border-color: #5a8874;
+                        background-color: #f0faf8;
+                    }
+
+                    .custom-select option {
+                        padding: 10px;
+                        color: #1f3f35;
+                    }
+
+                    .custom-textarea {
+                        resize: vertical;
+                        min-height: 120px;
+                    }
+
+                    .form-actions {
+                        display: flex;
+                        gap: 12px;
+                        margin-top: 32px;
+                        justify-content: center;
+                    }
+
+                    .btn-save {
+                        background: linear-gradient(135deg, #3f6f5d 0%, #5a8874 100%);
+                        color: white;
+                        border: none;
+                        border-radius: 12px;
+                        padding: 14px 48px;
+                        font-weight: 600;
+                        font-size: 1rem;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 4px 15px rgba(63, 111, 93, 0.3);
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                    }
+
+                    .btn-save:hover:not(:disabled) {
+                        transform: translateY(-2px);
+                        box-shadow: 0 6px 20px rgba(63, 111, 93, 0.4);
+                    }
+
+                    .btn-save:active:not(:disabled) {
+                        transform: translateY(0);
+                    }
+
+                    .btn-save:disabled {
+                        opacity: 0.7;
+                        cursor: not-allowed;
+                    }
+
+                    @keyframes slideDown {
+                        from {
+                            opacity: 0;
+                            transform: translateY(-30px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                    }
+
+                    @keyframes slideUp {
+                        from {
+                            opacity: 0;
+                            transform: translateY(30px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                    }
+
+                    @keyframes slideInDown {
+                        from {
+                            opacity: 0;
+                            transform: translateY(-20px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                    }
+
+                    @keyframes bounce {
+                        0%, 100% {
+                            transform: translateY(0);
+                        }
+                        50% {
+                            transform: translateY(-8px);
+                        }
+                    }
+
+                    @media (max-width: 991px) {
+                        .add-patient-page {
+                            padding: 20px 15px;
+                        }
+
+                        .patient-card {
+                            padding: 24px;
+                        }
+
+                        .page-title {
+                            font-size: 1.5rem;
+                        }
+
+                        .page-subtitle {
+                            font-size: 0.9rem;
+                        }
+
+                        .header-icon {
+                            font-size: 2rem;
+                        }
+
+                        .btn-save {
+                            padding: 12px 32px;
+                            width: 100%;
+                        }
+                    }
+                `}</style>
+            </div>
+        </>
+    );
 }
 
 export default AddPatient;
