@@ -7,7 +7,7 @@ function Appointments() {
     const [patients, setPatients] = useState([]);
     const [doctors, setDoctors] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const appointmentsPerPage = 8;
+    const appointmentsPerPage = 5;
     const [message, setMessage] = useState({ type: '', text: '' });
     const [searchData, setSearchData] = useState({
         patient: '',
