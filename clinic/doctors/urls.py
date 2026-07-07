@@ -26,4 +26,6 @@ urlpatterns = [
     path('leave/list/',views.leave_list),
     
     path('leave/delete/<int:id>/', views.delete_leave ),
+    
+    path('dropdown/', views.doctor_dropdown ),
 ]

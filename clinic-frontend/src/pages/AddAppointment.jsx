@@ -38,7 +38,7 @@ function AddAppointment(){
     const loadDoctors = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await api.get('doctors/list/', {
+            const response = await api.get('doctors/dropdown/', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setDoctors(response.data);

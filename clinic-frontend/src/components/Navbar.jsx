@@ -22,7 +22,6 @@ function Navbar() {
     { to: '/dashboard', label: 'Dashboard' },
     { to: '/patients', label: 'Patients' },
     { to: '/doctors', label: 'Doctors' },
-    { to: '/appointments/add', label: 'Add Appointment' },
     { to: '/appointments', label: 'Appointments' },
     { to: '/doctorAvailable', label: 'Availability' },
     { to: '/doctorLeave', label: 'Leave' },

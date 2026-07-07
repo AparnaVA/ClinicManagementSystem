@@ -9,7 +9,7 @@ from django.db.models import Q
 from .models import Doctor, DoctorAvailability, DoctorLeave
 from .serializers import DoctorSerializer, DoctorAvailabilitySerializer, DoctorLeaveSerializer
 
-from accounts.permissions import IsAdmin
+from accounts.permissions import IsAdmin, IsReceptionist
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated, IsAdmin])
@@ -45,6 +45,23 @@ def doctor_list(request):
     )
 
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def doctor_dropdown(request):
+
+    doctors = Doctor.objects.filter(
+        status='ACTIVE'
+    )
+
+    serializer = DoctorSerializer(
+        doctors,
+        many=True
+    )
+
+    return Response(serializer.data)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, IsAdmin])

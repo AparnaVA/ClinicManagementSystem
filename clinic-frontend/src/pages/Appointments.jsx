@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import api from '../api/axios';
 
@@ -9,6 +10,7 @@ function Appointments() {
     const [currentPage, setCurrentPage] = useState(1);
     const appointmentsPerPage = 5;
     const [message, setMessage] = useState({ type: '', text: '' });
+    const navigate = useNavigate();
     const [searchData, setSearchData] = useState({
         patient: '',
         doctor: '',
@@ -43,7 +45,7 @@ function Appointments() {
     const loadDoctors = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await api.get('doctors/list/', {
+            const response = await api.get('doctors/dropdown/', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setDoctors(response.data);
@@ -132,6 +134,12 @@ function Appointments() {
                                 <p className="page-subtitle">Manage and track all patient appointments</p>
                             </div>
                         </div>
+                        <button
+                            className="add-appointment-btn"
+                            onClick={() => navigate('/appointments/add')}
+                        >
+                            + Add Appointment
+                        </button>
                     </div>
 
                     {message.text && (
@@ -310,6 +318,10 @@ function Appointments() {
                     }
 
                     .page-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: flex-start;
+                        gap: 16px;
                         margin-bottom: 40px;
                         animation: slideDown 0.5s ease;
                     }
@@ -338,6 +350,23 @@ function Appointments() {
                         font-size: 1rem;
                         margin: 0;
                         font-weight: 400;
+                    }
+
+                    .add-appointment-btn {
+                        background: linear-gradient(135deg, #3f6f5d 0%, #5a8874 100%);
+                        color: white;
+                        border: none;
+                        border-radius: 10px;
+                        padding: 10px 16px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                        box-shadow: 0 4px 12px rgba(63, 111, 93, 0.2);
+                    }
+
+                    .add-appointment-btn:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 6px 16px rgba(63, 111, 93, 0.3);
                     }
 
                     .status-message {
@@ -635,6 +664,11 @@ function Appointments() {
                     }
 
                     @media (max-width: 991px) {
+                        .page-header {
+                            flex-direction: column;
+                            align-items: flex-start;
+                        }
+
                         .appointments-page {
                             padding: 20px 15px;
                         }
