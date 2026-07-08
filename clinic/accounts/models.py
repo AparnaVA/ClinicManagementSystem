@@ -10,8 +10,20 @@ class User(AbstractUser):
 
     role = models.CharField(
         max_length=20,
-        choices=Role.choices
+        choices=Role.choices,
+        default=Role.RECEPTIONIST
     )
+    
+    class Status(models.TextChoices):
+
+        ACTIVE = "ACTIVE", "Active"
+        INACTIVE = "INACTIVE", "Inactive"
+        
+    status = models.CharField(
+    max_length=20,
+    choices=Status.choices,
+    default=Status.ACTIVE
+)
 
     created_at = models.DateTimeField(auto_now_add=True)
     

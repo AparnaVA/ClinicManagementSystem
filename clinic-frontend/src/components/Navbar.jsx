@@ -21,6 +21,7 @@ function Navbar() {
   const links = [
     { to: '/dashboard', label: 'Dashboard' },
     { to: '/patients', label: 'Patients' },
+    { to: '/reception', label: 'Reception' },
     { to: '/doctors', label: 'Doctors' },
     { to: '/appointments', label: 'Appointments' },
     { to: '/doctorAvailable', label: 'Availability' },

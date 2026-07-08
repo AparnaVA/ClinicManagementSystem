@@ -14,6 +14,9 @@ import Appointments from './pages/Appointments';
 import DoctorAvailability from './pages/DoctorAvailability';
 import DoctorLeave from './pages/DoctorLeave';
 import AppointmentCalendar from './pages/AppointmentCalendar';
+import Reception from './pages/Reception'
+import AddReception from './pages/AddReception'
+import EditReception from './pages/EditReception'
 
 function App() {
 
@@ -46,6 +49,24 @@ function App() {
         />
 
         <Route
+          path="/reception"
+          element={
+              <ProtectedRoute>
+                  <Reception />
+              </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/reception/add"
+          element={
+              <ProtectedRoute>
+                  <AddReception />
+              </ProtectedRoute>
+          }
+        />
+
+        <Route
             path="/patients/add"
             element={
                 <ProtectedRoute>
@@ -59,6 +80,15 @@ function App() {
             element={
                 <ProtectedRoute>
                     <EditPatient />
+                </ProtectedRoute>
+            }
+        />
+
+        <Route
+            path="/reception/edit/:id"
+            element={
+                <ProtectedRoute>
+                    <EditReception />
                 </ProtectedRoute>
             }
         />

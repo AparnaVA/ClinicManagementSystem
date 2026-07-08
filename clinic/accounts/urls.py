@@ -58,4 +58,6 @@ urlpatterns = [
         'receptionists/delete/<int:id>/',
         views.delete_receptionist
     ),
+    
+    path('search/', views.search_reception),
 ]   

@@ -8,7 +8,8 @@ from django.conf import settings
 from .models import User
 from django.utils import timezone
 from datetime import timedelta
-from .serializers import ReceptionistSerializer
+from .serializers import ReceptionistSerializer, UserSerializer
+from django.db.models import Q
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -217,3 +218,21 @@ def delete_receptionist(request, id):
     return Response({
         "message": "Receptionist deleted successfully"
     })
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAdmin])
+def search_reception(request):
+
+    keyword = request.GET.get('search')
+
+    reception = User.objects.filter(
+        Q(username__icontains=keyword) |
+        Q(email__icontains=keyword)
+    )
+
+    serializer = UserSerializer(
+        reception,
+        many=True
+    )
+
+    return Response(serializer.data)

@@ -6,7 +6,6 @@ from django.db.models import Q
 
 from .models import Patient
 from .serializers import PatientSerializer
-from django.db.models import Q
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
