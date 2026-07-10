@@ -9,6 +9,9 @@ function Patients() {
   const [currentPage, setCurrentPage] = useState(1)
   const patientsPerPage = 5
 
+  // 1. Retrieve the logged-in user role from localStorage
+  const userRole = localStorage.getItem('role') || 'reception'
+
   useEffect(() => {
     fetchPatients()
   }, [])
@@ -16,13 +19,11 @@ function Patients() {
   const fetchPatients = async () => {
     try {
       const token = localStorage.getItem('token')
-
       const response = await api.get('patients/list/', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
-
       setPatients(response.data)
     } catch (error) {
       console.log(error)
@@ -30,19 +31,23 @@ function Patients() {
   }
 
   const deletePatient = async (id) => {
-    if (!window.confirm('Delete Patient?')) {
+    // 2. Extra safety safeguard check in case button is somehow exposed
+    if (userRole === 'admin') {
+      alert('Access Denied: Admins hold read-only clearance.')
+      return
+    }
+
+    if (!window.confirm('Delete Patient Record?')) {
       return
     }
 
     try {
       const token = localStorage.getItem('token')
-
       await api.delete(`patients/delete/${id}/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
-
       fetchPatients()
     } catch (error) {
       console.log(error)
@@ -52,13 +57,11 @@ function Patients() {
   const searchPatients = async () => {
     try {
       const token = localStorage.getItem('token')
-
       const response = await api.get(`patients/search/?search=${keyword}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
-
       setPatients(response.data)
     } catch (error) {
       console.log(error)
@@ -70,7 +73,6 @@ function Patients() {
       fetchPatients()
       return
     }
-
     searchPatients()
   }, [keyword])
 
@@ -85,107 +87,217 @@ function Patients() {
   return (
     <>
       <Navbar />
-      <div className="patients-page">
+      <div className="patients-page page-fade-in">
         <style>{`
           .patients-page {
             min-height: 100vh;
-            background: linear-gradient(135deg, #f7fbf8 0%, #eef6f4 100%);
-            padding: 24px 0 40px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f4f7f5 0%, #edf3f0 100%);
+            padding: 32px 0 60px;
+            font-family: 'Inter', system-ui, sans-serif;
+            color: #334155;
+          }
+
+          .page-fade-in {
+            animation: slideUpFade 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          }
+
+          @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
           }
 
           .page-card {
-            background: rgba(255,255,255,0.96);
-            border: 0;
-            border-radius: 24px;
-            box-shadow: 0 14px 40px rgba(31, 63, 53, 0.08);
-            padding: 24px;
+            background: #ffffff;
+            border: 1px solid rgba(47, 91, 74, 0.08);
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(31, 63, 53, 0.03);
+            padding: 28px;
           }
 
           .page-title {
             color: #1f3f35;
             font-weight: 700;
+            letter-spacing: -0.02em;
           }
 
           .search-box {
-            border-radius: 999px;
-            border: 4px solid #dce9e3;
-            padding: 12px 16px;
-            background: #f8fcfa;
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            color: #334155;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            transition: all 0.15s ease-in-out;
+            min-width: 260px;
           }
 
           .search-box:focus {
-            box-shadow: 0 0 0 0.2rem rgba(63, 111, 93, 0.16);
-            border-color: #8dc3b6;
+            background-color: #ffffff;
+            border-color: #2f5b4a;
+            outline: 0;
+            box-shadow: 0 0 0 3px rgba(47, 91, 74, 0.12);
           }
 
           .add-btn {
-            border-radius: 999px;
-            padding: 10px 16px;
-            background: linear-gradient(135deg, #3f6f5d, #5a8874);
-            border: none;
+            background: #2f5b4a !important;
+            color: white !important;
             font-weight: 600;
+            font-size: 0.9rem;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(47, 91, 74, 0.15);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+          }
+
+          .add-btn:hover {
+            background: #1f3f35 !important;
+            transform: translateY(-1px);
           }
 
           .table-wrap {
             overflow: hidden;
-            border-radius: 16px;
-            border: 1px solid #e8f1ec;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+          }
+
+          .patients-table {
+            margin-bottom: 0;
+            font-size: 0.9rem;
+            vertical-align: middle;
           }
 
           .patients-table thead {
-            background: linear-gradient(135deg, #3f6f5d, #5a8874);
-            color: white;
+            background-color: #f8fafc;
           }
 
-          .patients-table th,
-          .patients-table td {
-            vertical-align: middle;
+          .patients-table th {
+            font-weight: 600;
+            color: #475569;
             padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.825rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
           }
 
-          .patients-table tbody tr:nth-child(even) {
-            background: #f8fcfa;
+          .patients-table td {
+            padding: 16px;
+            color: #000000;
+            border-bottom: 1px solid #f1f5f9;
+          }
+
+          .patients-table tbody tr:last-child td {
+            border-bottom: none;
+          }
+
+          .patient-id-cell {
+            font-variant-numeric: tabular-nums;
+            font-weight: 500;
+            color: #64748b;
+          }
+
+          .patient-name-cell {
+            font-weight: 600;
+            color: #1e293b;
           }
 
           .action-btn-edit {
-            border-radius: 999px;
-            padding: 7px 12px;
-            background: #f7d97a;
-            color: #6c4c0b;
-            border: none;
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+            padding: 6px 14px;
+            font-size: 0.8rem;
             font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.15s ease;
+            text-decoration: none;
+            display: inline-block;
+          }
+
+          .action-btn-edit:hover {
+            background: #f59e0b;
+            color: white;
+            border-color: #f59e0b;
           }
 
           .action-btn-delete {
-            border-radius: 999px;
-            padding: 7px 12px;
-            background: #f7dede;
-            color: #9b1c1c;
-            border: none;
+            background: #fff5f5;
+            color: #e53e3e;
+            border: 1px solid #fed7d7;
+            padding: 6px 14px;
+            font-size: 0.8rem;
             font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.15s ease;
+          }
+
+          .action-btn-delete:hover {
+            background: #e53e3e;
+            color: white;
+            border-color: #e53e3e;
+          }
+
+          /* --- Read Only Indicator pill for Admin view --- */
+          .readonly-badge {
+            display: inline-block;
+            background: #f1f5f9;
+            color: #64748b;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+          }
+
+          .empty-state {
+            padding: 48px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.95rem;
           }
 
           .pagination-wrap {
             display: flex;
             justify-content: center;
-            margin-top: 16px;
-            gap: 8px;
+            margin-top: 24px;
+            gap: 4px;
           }
 
           .page-btn {
-            border-radius: 999px;
-            border: 1px solid #dce9e3;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
             background: white;
+            color: #4a5568;
+            padding: 6px 14px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+          }
+
+          .page-btn:hover:not(:disabled) {
+            border-color: #2f5b4a;
             color: #2f5b4a;
-            padding: 7px 12px;
-            font-weight: 600;
+            background: #f8faf9;
           }
 
           .page-btn.active {
-            background: linear-gradient(135deg, #3f6f5d, #5a8874);
+            background: #2f5b4a;
             color: white;
-            border: none;
+            border-color: #2f5b4a;
+          }
+
+          .page-btn:disabled {
+            background: #f1f5f9;
+            color: #94a3b8;
+            border-color: #e2e8f0;
+            cursor: not-allowed;
           }
         `}</style>
 
@@ -193,21 +305,29 @@ function Patients() {
           <div className="page-card">
             <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
               <div>
-                <h2 className="page-title mb-1">Patients</h2>
-                <p className="text-muted mb-0">Manage patient records and keep everything organized.</p>
+                <h3 className="page-title mb-1">Patients Registry</h3>
+                <p className="text-muted small mb-0">
+                  {userRole === 'ADMIN' 
+                    ? 'Read-only profile directory access for clinic operations auditing.' 
+                    : 'Audit clinical health accounts, adjust diagnostic profiling parameters, and maintain directories.'}
+                </p>
               </div>
 
-              <div className="d-flex flex-column flex-md-row gap-2 w-100 w-md-auto">
+              <div className="d-flex flex-column flex-sm-row gap-2 w-100 w-md-auto align-items-sm-center">
                 <input
                   type="text"
-                  className="form-control search-box"
-                  placeholder="Search patient"
+                  className="search-box"
+                  placeholder="🔍 Search patient data registry..."
                   value={keyword}
                   onChange={(e) => setKeyword(e.target.value)}
                 />
-                <Link to="/patients/add" className="btn btn-primary add-btn">
-                  Add Patient
-                </Link>
+                
+                {/* 3. Conditional rendering: Hide "Add Patient" if user is an admin */}
+                {userRole !== 'ADMIN' && (
+                  <Link to="/patients/add" className="add-btn">
+                    Add Patient
+                  </Link>
+                )}
               </div>
             </div>
 
@@ -215,30 +335,47 @@ function Patients() {
               <table className="table table-hover mb-0 patients-table">
                 <thead>
                   <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Phone</th>
-                    <th>Email</th>
-                    <th>Actions</th>
+                    <th>Id</th>
+                    <th>Full Name</th>
+                    <th>Contact Phone</th>
+                    <th>Email Address</th>
+                    <th className="text-end">
+                      {userRole === 'ADMIN' ? 'Clearance Access' : 'Management Actions'}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {currentPatients.map((patient) => (
-                    <tr key={patient.id}>
-                      <td>{patient.patient_id}</td>
-                      <td>{patient.name}</td>
-                      <td>{patient.phone}</td>
-                      <td>{patient.email}</td>
-                      <td>
-                        <Link to={`/patients/edit/${patient.id}`} className="btn btn-sm action-btn-edit me-2">
-                          Edit
-                        </Link>
-                        <button className="btn btn-sm action-btn-delete" onClick={() => deletePatient(patient.id)}>
-                          Delete
-                        </button>
+                  {currentPatients.length === 0 ? (
+                    <tr>
+                      <td colSpan="5" className="empty-state">
+                        📋 No patient accounts matching your current search parameters were located.
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    currentPatients.map((patient) => (
+                      <tr key={patient.id}>
+                        <td className="patient-id-cell">{patient.patient_id}</td>
+                        <td className="patient-name-cell">{patient.name}</td>
+                        <td>{patient.phone}</td>
+                        <td>{patient.email}</td>
+                        <td className="text-end">
+                          {/* 4. Conditional rendering: Hide mutation buttons if admin */}
+                          {userRole === 'ADMIN' ? (
+                            <span className="readonly-badge">View Only</span>
+                          ) : (
+                            <>
+                              <Link to={`/patients/edit/${patient.id}`} className="action-btn-edit me-2">
+                                Edit
+                              </Link>
+                              <button className="action-btn-delete" onClick={() => deletePatient(patient.id)}>
+                                Delete
+                              </button>
+                            </>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

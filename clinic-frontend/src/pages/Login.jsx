@@ -17,7 +17,21 @@ function Login() {
         password,
       })
 
-      localStorage.setItem('token', response.data.access)
+      const accessToken = response.data.access
+      localStorage.setItem('token', accessToken)
+
+      try {
+        const meResponse = await api.get('accounts/me/', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+
+        localStorage.setItem('role', meResponse.data.role || '')
+      } catch {
+        localStorage.removeItem('role')
+      }
+
       setMessage({ type: 'success', text: 'Welcome back! Redirecting to your dashboard...' })
       setTimeout(() => navigate('/dashboard'), 1000)
     } catch {
